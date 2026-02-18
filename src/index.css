@@ -1,12 +1,40 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&display=swap');
+/* 1. Fixed Imports: Added 'Poppins' so your font-display works */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Poppins:wght@400;500;600;700&display=swap');
 
 @import "tailwindcss";
 
 @theme {
-  /* Define custom brand colors here */
+  /* Brand Colors */
   --color-cmas-teal: #0d9488; 
   --color-cmas-dark: #111827; 
   
-  /* Setting custom fonts */
+  /* Fonts */
   --font-display: "Poppins", sans-serif;
+}
+
+@layer utilities {
+  .pause {
+    animation-play-state: paused;
+  }
+}
+
+/* === ANIMATION LOGIC === */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%); /* Moves halfway because we duplicate the list */
+  }
+}
+
+.animate-scroll {
+  animation: scroll 40s linear infinite; /* Adjust speed here (40s is smooth) */
+}
+
+/* === THE FIX: FORCE PAUSE ON HOVER === */
+/* This rule says: "When the element with class 'group' is hovered, 
+   find the child with class 'animate-scroll' and pause it." */
+.group:hover .animate-scroll {
+  animation-play-state: paused !important;
 }
