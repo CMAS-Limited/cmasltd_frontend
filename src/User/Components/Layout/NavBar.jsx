@@ -29,13 +29,14 @@ const Navbar = () => {
             className="text-4xl text-white tracking-tight leading-none" 
             style={{ fontFamily: '"Playfair Display", serif' }}
           >
-            CMAS
+          CMAS
           </span>
           <img 
-            src="public/image/cmasLogo.png" 
-            alt="CMAS Logo" 
+            src="/image/cmasLogo.png" 
+            alt="" 
             className="h-8 w-auto object-contain mt-1" 
-          />
+            onError={(e) => { e.target.style.display = 'none'; }}
+          />    
         </a>
 
         {/* Desktop Links */}

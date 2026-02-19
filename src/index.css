@@ -38,3 +38,32 @@
 .group:hover .animate-scroll {
   animation-play-state: paused !important;
 }
+
+/* === CUSTOM GLOBAL SCROLLBAR === */
+
+/* For Firefox */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-cmas-teal) var(--color-cmas-dark);
+}
+
+/* For Chrome, Edge, and Safari */
+::-webkit-scrollbar {
+  width: 8px; /* Sleek and lowkey width */
+}
+
+/* The track (background of the scrollbar) */
+::-webkit-scrollbar-track {
+  background: var(--color-cmas-dark); /* Using your brand dark color */
+}
+
+/* The thumb (the part you drag) */
+::-webkit-scrollbar-thumb {
+  background: var(--color-cmas-teal); /* Using your brand teal */
+  border-radius: 10px; /* Smooth rounded edges */
+}
+
+/* Hover effect for the thumb */
+::-webkit-scrollbar-thumb:hover {
+  background: #14b8a6; /* A slightly brighter teal when hovered */
+}

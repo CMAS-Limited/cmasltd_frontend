@@ -5,6 +5,8 @@ import Stats from './User/Pages/Home/StatsBar';
 import Services from './User/Pages/Home/ServicesSection';
 import FeaturedProjects from './User/Pages/Home/FeautredProjects';
 import Team from './User/Pages/Home/TeamMembers';
+import Contact from './User/Pages/Home/ContactsUs';
+import Footer from './User/Components/Layout/Footer';
 
 function App() {
   return (
@@ -21,11 +23,12 @@ function App() {
       <FeaturedProjects />
       {/* Team Section */}
       <Team />
+      {/* Contact Section */}
+      <Contact />
 
-      {/* Temporary spacer to allow scrolling */}
-      <div className="h-[500px] flex items-center justify-center">
-        <p className="text-gray-400">Next Sections Go Here...</p>
-      </div>
+      {/* Footer */}
+      <Footer />
+
     </div>
   );
 }
