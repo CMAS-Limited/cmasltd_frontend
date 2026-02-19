@@ -34,9 +34,16 @@ const Footer = () => {
           
           {/* Column 1: Brand & Tagline */}
           <div className="lg:col-span-4">
-            <div className="flex items-center gap-2 mb-6">
-              <h2 className="text-3xl font-bold font-display tracking-tight">
-                CMAS<span className="text-teal-500">.</span>
+            <div className="mb-6">
+            {/* Added 'flex items-center gap-1' directly to the h2 */}
+              <h2 className="flex items-center gap-1 text-3xl font-bold font-display tracking-tight">
+                CMAS
+              <img 
+                src="/image/cmasLogo.png" 
+                alt="" 
+                className="h-8 w-auto object-contain" 
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
               </h2>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-8 max-w-sm">

@@ -1,35 +1,35 @@
 // src/App.jsx
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './User/Components/Layout/NavBar';
-import Hero from './User/Pages/Home/HeroSection'; 
-import Stats from './User/Pages/Home/StatsBar';
-import Services from './User/Pages/Home/ServicesSection';
-import FeaturedProjects from './User/Pages/Home/FeautredProjects';
-import Team from './User/Pages/Home/TeamMembers';
-import Contact from './User/Pages/Home/ContactsUs';
 import Footer from './User/Components/Layout/Footer';
+
+// Pages
+import Home from './User/Pages/Home/Home';
+import About from './User/Pages/About';
 
 function App() {
   return (
-    <div className="min-h-screen font-sans text-gray-900 bg-gray-50">
-      <Navbar />
-      
-      {/* Hero Section */}
-      <Hero />
-      {/* Stats Bar */}
-      <Stats />
-      {/* Services Section */}
-      <Services />
-      {/* Featured Projects Section */}
-      <FeaturedProjects />
-      {/* Team Section */}
-      <Team />
-      {/* Contact Section */}
-      <Contact />
+    <Router>
+      {/* SOLUTION: Added overflow-x-hidden right here */}
+      <div className="flex flex-col min-h-screen font-sans text-gray-900 bg-gray-50 ">
+        
+        {/* Navbar stays at the top of every page */}
+        <Navbar />
+        
+        {/* Routes determine which page content to load in the middle */}
+        <div className="flex-grow">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            {/* You can add more pages here later, e.g., <Route path="/portfolio" element={<Portfolio />} /> */}
+          </Routes>
+        </div>
 
-      {/* Footer */}
-      <Footer />
+        {/* Footer stays at the bottom of every page */}
+        <Footer />
 
-    </div>
+      </div>
+    </Router>
   );
 }
 
