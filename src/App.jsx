@@ -4,6 +4,7 @@ import Hero from './User/Pages/Home/HeroSection';
 import Stats from './User/Pages/Home/StatsBar';
 import Services from './User/Pages/Home/ServicesSection';
 import FeaturedProjects from './User/Pages/Home/FeautredProjects';
+import Team from './User/Pages/Home/TeamMembers';
 
 function App() {
   return (
@@ -18,6 +19,8 @@ function App() {
       <Services />
       {/* Featured Projects Section */}
       <FeaturedProjects />
+      {/* Team Section */}
+      <Team />
 
       {/* Temporary spacer to allow scrolling */}
       <div className="h-[500px] flex items-center justify-center">
