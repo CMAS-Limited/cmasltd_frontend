@@ -55,7 +55,6 @@ const About = () => {
   ];
 
   return (
-    // No overflow-hidden here so sticky works!
     <div className="bg-[#F0F5F4] pt-16 pb-12">
       
       {/* === 1. HERO: Elevated Editorial Layout === */}
@@ -91,7 +90,6 @@ const About = () => {
 
           {/* Right Image with Floating Badge */}
           <div className="lg:col-span-7 relative mt-10 lg:mt-0">
-            {/* THE FIX: Changed -right-10 to right-0 here to stop horizontal scrolling */}
             <div className="absolute -top-10 right-0 w-[90%] h-[90%] bg-gradient-to-br from-[#E2ECEB] to-transparent rounded-[3rem] -z-10 blur-xl"></div>
             
             <div className="relative h-[450px] md:h-[650px] rounded-[2.5rem] overflow-hidden shadow-2xl shadow-teal-900/10 border-4 border-white">
@@ -204,15 +202,26 @@ const About = () => {
                 </p>
               </div>
               <div className="md:w-auto relative z-10">
-                <div className="flex items-center gap-5 bg-white/5 backdrop-blur-md px-8 py-5 rounded-2xl border border-white/10">
-                  <div className="p-3 bg-teal-500/20 rounded-xl text-teal-400">
+                
+                {/* SYSTEM UPDATE: Outer container converted to primary anchor tag block */}
+                <a 
+                  href="/Files/2020RIBAOVERVIEW.pdf" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-5 bg-white/5 hover:bg-white/10 backdrop-blur-md px-8 py-5 rounded-2xl border border-white/10 cursor-pointer group/link transition-all duration-300"
+                >
+                  <div className="p-3 bg-teal-500/20 rounded-xl text-teal-400 group-hover/link:bg-teal-500 group-hover/link:text-white transition-colors duration-300">
                     <FileText className="w-6 h-6" />
                   </div>
                   <div>
                     <p className="text-[10px] text-teal-400 uppercase tracking-widest font-bold mb-1">Methodology</p>
-                    <p className="text-xl font-display font-bold">RIBA Framework</p>
+                    <p className="text-xl font-display font-bold group-hover/link:text-teal-300 transition-colors">
+                      RIBA Framework
+                    </p>
                   </div>
-                </div>
+                </a>
+                {/* END SYSTEM UPDATE */}
+
               </div>
             </div>
 
