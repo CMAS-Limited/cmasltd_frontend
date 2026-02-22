@@ -12,8 +12,8 @@ const Navbar = () => {
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
     { name: 'Expertise', path: '/#expertise' },
-    { name: 'Portfolio', path: '/#portfolio' },
-    { name: 'Team', path: '/#team' }
+    { name: 'Portfolio', path: '/portfolio' },
+    { name: 'Team', path: '/team' }
   ];
 
   // Change background on scroll

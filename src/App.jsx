@@ -6,6 +6,8 @@ import Footer from './User/Components/Layout/Footer';
 // Pages
 import Home from './User/Pages/Home/Home';
 import About from './User/Pages/About';
+import Portfolio from './User/Pages/Portfolio/Portfolio';
+import Team from './User/Pages/Team/Team';
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
+            <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/team" element={<Team />} />
             {/* You can add more pages here later, e.g., <Route path="/portfolio" element={<Portfolio />} /> */}
           </Routes>
         </div>
