@@ -8,6 +8,7 @@ import Home from './User/Pages/Home/Home';
 import About from './User/Pages/About';
 import Portfolio from './User/Pages/Portfolio/Portfolio';
 import Team from './User/Pages/Team/Team';
+import Contact from './User/Pages/Contact/Contact';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/team" element={<Team />} />
+            <Route path="/contact" element={<Contact />} />
             {/* You can add more pages here later, e.g., <Route path="/portfolio" element={<Portfolio />} /> */}
           </Routes>
         </div>

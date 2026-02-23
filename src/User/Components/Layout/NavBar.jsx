@@ -7,7 +7,7 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
 
-  // Navigation Data based on your design
+  // Navigation Data
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
@@ -47,17 +47,14 @@ const Navbar = () => {
     ? 'bg-[#111827]/95 backdrop-blur-sm py-4 shadow-md' 
     : 'bg-transparent py-6';
 
-  // === THE FIX: Smarter Active State Logic ===
+  // Active State Logic
   const isActive = (path) => {
-    // 1. If it's a hash link (e.g., '/#expertise'), check if the current hash matches
     if (path.includes('#')) {
       return location.hash === path.substring(1); 
     }
-    // 2. If it's the Home link, ensure we are strictly on '/' with NO hash active
     if (path === '/') {
       return location.pathname === '/' && location.hash === '';
     }
-    // 3. If it's a standard page link (e.g., '/about'), match the pathname
     return location.pathname === path;
   };
 
@@ -75,7 +72,7 @@ const Navbar = () => {
           </span>
           <img 
             src="/image/cmasLogo.png" 
-            alt="" 
+            alt="CMAS Logo" 
             className="h-8 w-auto object-contain mt-1" 
             onError={(e) => { e.target.style.display = 'none'; }}
           />    
@@ -96,9 +93,9 @@ const Navbar = () => {
           ))}
         </div>
 
-        {/* CTA Button */}
+        {/* === UPDATED: Desktop CTA Button === */}
         <div className="hidden md:block">
-          <Link to="/#contact">
+          <Link to="/contact">
             <button className="bg-teal-600 hover:bg-teal-500 text-white px-5 py-2 rounded-md font-medium text-sm transition-colors cursor-pointer">
               REACH US
             </button>
@@ -129,7 +126,9 @@ const Navbar = () => {
                 {item.name}
               </Link>
             ))}
-            <Link to="/#contact" onClick={() => setIsOpen(false)}>
+            
+            {/* === UPDATED: Mobile CTA Button === */}
+            <Link to="/contact" onClick={() => setIsOpen(false)}>
               <button className="bg-teal-600 hover:bg-teal-500 transition-colors text-white py-3 rounded-md font-medium w-full mt-2">
                 REACH US
               </button>
