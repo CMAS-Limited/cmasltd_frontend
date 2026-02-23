@@ -1,24 +1,27 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; // Imported Link for SPA routing
 import { Linkedin, Twitter, Facebook, Instagram, ArrowRight, Lock } from 'lucide-react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
+  // Updated hrefs to match your actual React Router paths
   const quickLinks = [
-    { name: 'Home', href: '#' },
-    { name: 'About Us', href: '#' },
-    { name: 'Our Expertise', href: '#expertise' },
-    { name: 'Portfolio', href: '#portfolio' },
-    { name: 'Our Team', href: '#team' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'Home', path: '/' },
+    { name: 'About Us', path: '/about' },
+    { name: 'Our Expertise', path: '/#expertise' },
+    { name: 'Portfolio', path: '/portfolio' },
+    { name: 'Our Team', path: '/team' },
+    { name: 'Contact', path: '/contact' },
   ];
 
+  // Pointing these to the expertise section for now
   const services = [
-    { name: 'Project Management', href: '#' },
-    { name: 'Programme Management', href: '#' },
-    { name: 'Contract Administration', href: '#' },
-    { name: 'Quantity Surveying', href: '#' },
-    { name: 'Alternative Dispute Resolution', href: '#' },
+    { name: 'Project Management', path: '/#expertise' },
+    { name: 'Programme Management', path: '/#expertise' },
+    { name: 'Contract Administration', path: '/#expertise' },
+    { name: 'Quantity Surveying', path: '/#expertise' },
+    { name: 'Alternative Dispute Resolution', path: '/#expertise' },
   ];
 
   return (
@@ -35,33 +38,32 @@ const Footer = () => {
           {/* Column 1: Brand & Tagline */}
           <div className="lg:col-span-4">
             <div className="mb-6">
-            {/* Added 'flex items-center gap-1' directly to the h2 */}
-              <h2 className="flex items-center gap-1 text-3xl font-bold font-display tracking-tight">
+              <Link to="/" className="flex items-center gap-1 text-3xl font-bold font-display tracking-tight hover:opacity-80 transition-opacity">
                 CMAS
-              <img 
-                src="/image/cmasLogo.png" 
-                alt="" 
-                className="h-8 w-auto object-contain" 
-                onError={(e) => { e.target.style.display = 'none'; }}
-              />
-              </h2>
+                <img 
+                  src="/image/cmasLogo.png" 
+                  alt="CMAS Logo" 
+                  className="h-8 w-auto object-contain" 
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+              </Link>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-8 max-w-sm">
               Delivering world-class project management, quantity surveying, and dispute resolution services across East Africa. We turn complex visions into reality.
             </p>
             
-            {/* Social Icons */}
+            {/* Social Icons (External links, keep as standard <a> tags) */}
             <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-teal-500 hover:text-gray-900 hover:border-teal-500 transition-all duration-300">
+              <a href="#" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-teal-500 hover:text-gray-900 hover:border-teal-500 transition-all duration-300">
                 <Linkedin className="w-4 h-4" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-teal-500 hover:text-gray-900 hover:border-teal-500 transition-all duration-300">
+              <a href="#" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-teal-500 hover:text-gray-900 hover:border-teal-500 transition-all duration-300">
                 <Twitter className="w-4 h-4" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-teal-500 hover:text-gray-900 hover:border-teal-500 transition-all duration-300">
+              <a href="#" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-teal-500 hover:text-gray-900 hover:border-teal-500 transition-all duration-300">
                 <Facebook className="w-4 h-4" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-teal-500 hover:text-gray-900 hover:border-teal-500 transition-all duration-300">
+              <a href="#" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-teal-500 hover:text-gray-900 hover:border-teal-500 transition-all duration-300">
                 <Instagram className="w-4 h-4" />
               </a>
             </div>
@@ -73,10 +75,11 @@ const Footer = () => {
             <ul className="space-y-3">
               {quickLinks.map((link, index) => (
                 <li key={index}>
-                  <a href={link.href} className="group flex items-center text-sm text-gray-400 hover:text-teal-400 transition-colors">
+                  {/* Changed to React Router <Link> */}
+                  <Link to={link.path} className="group flex items-center text-sm text-gray-400 hover:text-teal-400 transition-colors">
                     <ArrowRight className="w-3 h-3 mr-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-teal-500" />
                     <span className="transform group-hover:translate-x-1 transition-transform duration-300">{link.name}</span>
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -88,10 +91,11 @@ const Footer = () => {
             <ul className="space-y-3">
               {services.map((service, index) => (
                 <li key={index}>
-                  <a href={service.href} className="group flex items-center text-sm text-gray-400 hover:text-teal-400 transition-colors">
+                  {/* Changed to React Router <Link> */}
+                  <Link to={service.path} className="group flex items-center text-sm text-gray-400 hover:text-teal-400 transition-colors">
                     <ArrowRight className="w-3 h-3 mr-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-teal-500" />
                     <span className="transform group-hover:translate-x-1 transition-transform duration-300">{service.name}</span>
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -99,20 +103,20 @@ const Footer = () => {
 
           {/* Column 4: Lowkey Staff Portal */}
           <div className="lg:col-span-2">
-            {/* Notice the text colors are muted (gray-600) compared to the columns above */}
             <h4 className="text-gray-600 font-bold tracking-widest uppercase text-[10px] mb-6">Corporate</h4>
             <p className="text-gray-600 text-xs leading-relaxed mb-4">
               Secure access portal for authorized CMAS personnel and site administration.
             </p>
             
-            <a 
-              href="/admin/login" 
+            {/* Changed to React Router <Link> */}
+            <Link 
+              to="/admin/login" 
               className="group inline-flex items-center gap-2 text-gray-500 hover:text-teal-500 text-xs font-medium transition-colors"
             >
               <Lock className="w-3.5 h-3.5" />
               <span>Admin Login</span>
               <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
-            </a>
+            </Link>
           </div>
 
         </div>
@@ -123,8 +127,9 @@ const Footer = () => {
             &copy; {currentYear} Construction Management Advisory Services (CMAS). All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <a href="#" className="text-gray-500 hover:text-white text-xs transition-colors">Privacy Policy</a>
-            <a href="#" className="text-gray-500 hover:text-white text-xs transition-colors">Terms of Service</a>
+            {/* Standard links for legal pages if they exist later */}
+            <Link to="/privacy" className="text-gray-500 hover:text-white text-xs transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="text-gray-500 hover:text-white text-xs transition-colors">Terms of Service</Link>
           </div>
         </div>
 
