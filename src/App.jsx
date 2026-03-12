@@ -5,6 +5,9 @@ import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom
 import Navbar from './User/Components/Layout/NavBar';
 import Footer from './User/Components/Layout/Footer';
 
+// Admin Layout Component
+import AdminLayout from './Admin/Components/Layout/AdminLayout';
+
 // Public Pages
 import Home from './User/Pages/Home/Home';
 import About from './User/Pages/About';
@@ -14,6 +17,16 @@ import Contact from './User/Pages/Contact/Contact';
 
 // Admin Pages
 import AdminLogin from './Admin/Pages/Login/AdminLogin';
+import DashboardHome from './Admin/Pages/DashboardHome/DashboardHome';
+import InquiriesList from './Admin/Pages/Inquiries/InquiriesList';
+import ManagePortfolio from './Admin/Pages/Portfolio/ManagePortfolio';
+
+// ==========================================
+// TEMPORARY ADMIN PAGE PLACEHOLDERS
+// (We will replace these with real files next)
+// ==========================================
+const ManageTeam = () => <div className="text-gray-500 font-medium">Team Management (Under Construction)</div>;
+const ManageServices = () => <div className="text-gray-500 font-medium">Services Management (Under Construction)</div>;
 
 // ==========================================
 // LAYOUT CONTROLLERS
@@ -41,8 +54,17 @@ function App() {
     <Router>
       <Routes>
         
-        {/* INGRESS: Admin Routes (Isolated from Public Layout) */}
+        {/* INGRESS: Admin Authentication (Standalone, no layout) */}
         <Route path="/admin/login" element={<AdminLogin />} />
+
+        {/* SECURE ZONE: Admin Dashboard & Management (Wrapped in AdminLayout) */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route path="dashboard" element={<DashboardHome />} />
+          <Route path="inquiries" element={<InquiriesList />} />
+          <Route path="portfolio" element={<ManagePortfolio />} />
+          <Route path="team" element={<ManageTeam />} />
+          <Route path="services" element={<ManageServices />} />
+        </Route>
 
         {/* EGRESS: Public Website Routes */}
         <Route element={<PublicLayout />}>
