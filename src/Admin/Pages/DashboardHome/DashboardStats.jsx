@@ -1,12 +1,11 @@
 import React from 'react';
 import { Users, Briefcase, Layers, MessageSquare } from 'lucide-react';
 
-const DashboardStats = ({ inquiryCount, isLoading }) => {
-  // Static stats for modules not yet wired to the backend
+const DashboardStats = ({ inquiryCount, projectCount, serviceCount, teamCount, isLoading }) => {
   const stats = [
-    { label: 'Total Projects', value: '--', icon: <Briefcase className="w-5 h-5 text-blue-600" />, bg: 'bg-blue-50' },
-    { label: 'Active Services', value: '--', icon: <Layers className="w-5 h-5 text-purple-600" />, bg: 'bg-purple-50' },
-    { label: 'Team Members', value: '--', icon: <Users className="w-5 h-5 text-orange-600" />, bg: 'bg-orange-50' },
+    { label: 'Total Projects', value: isLoading ? '...' : projectCount, icon: <Briefcase className="w-5 h-5 text-blue-600" />, bg: 'bg-blue-50' },
+    { label: 'Active Services', value: isLoading ? '...' : serviceCount, icon: <Layers className="w-5 h-5 text-purple-600" />, bg: 'bg-purple-50' },
+    { label: 'Team Members', value: isLoading ? '...' : teamCount, icon: <Users className="w-5 h-5 text-orange-600" />, bg: 'bg-orange-50' },
     { label: 'Total Inquiries', value: isLoading ? '...' : inquiryCount, icon: <MessageSquare className="w-5 h-5 text-teal-600" />, bg: 'bg-teal-50' },
   ];
 

@@ -5,8 +5,14 @@ import { supabase } from '../../../supabaseClient';
 import DashboardStats from './DashboardStats';
 import RecentInquiriesPanel from './RecentInquiriesPanel';
 import QuickActionsPanel from './QuickActionsPanel';
+
 const DashboardHome = () => {
+  // State for all numerical statistics
   const [inquiryCount, setInquiryCount] = useState(0);
+  const [projectCount, setProjectCount] = useState(0);
+  const [serviceCount, setServiceCount] = useState(0);
+  const [teamCount, setTeamCount] = useState(0);
+  
   const [recentInquiries, setRecentInquiries] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -17,15 +23,25 @@ const DashboardHome = () => {
   const fetchDashboardData = async () => {
     setIsLoading(true);
     try {
-      // 1. Get total count of inquiries
-      const { count, error: countError } = await supabase
-        .from('contact_inquiries')
-        .select('*', { count: 'exact', head: true });
-      
-      if (countError) throw countError;
-      setInquiryCount(count || 0);
+      // Execute all count queries concurrently for maximum performance
+      const [
+        { count: inquiries },
+        { count: projects },
+        { count: services },
+        { count: team }
+      ] = await Promise.all([
+        supabase.from('contact_inquiries').select('*', { count: 'exact', head: true }),
+        supabase.from('portfolio_projects').select('*', { count: 'exact', head: true }),
+        supabase.from('services').select('*', { count: 'exact', head: true }),
+        supabase.from('team_members').select('*', { count: 'exact', head: true })
+      ]);
 
-      // 2. Get the 3 most recent inquiries
+      setInquiryCount(inquiries || 0);
+      setProjectCount(projects || 0);
+      setServiceCount(services || 0);
+      setTeamCount(team || 0);
+
+      // Fetch the 3 most recent inquiries for the feed
       const { data: recent, error: recentError } = await supabase
         .from('contact_inquiries')
         .select('id, full_name, company_subject, created_at')
@@ -36,7 +52,7 @@ const DashboardHome = () => {
       setRecentInquiries(recent || []);
 
     } catch (error) {
-      console.error("Error fetching dashboard data:", error.message);
+      console.error("Data Extraction Error:", error.message);
     } finally {
       setIsLoading(false);
     }
@@ -51,9 +67,12 @@ const DashboardHome = () => {
         <p className="text-sm text-gray-500">Welcome to the CMAS administrative workspace.</p>
       </div>
 
-      {/* Stats Grid Module */}
+      {/* Stats Grid Module with live data injection */}
       <DashboardStats 
         inquiryCount={inquiryCount} 
+        projectCount={projectCount}
+        serviceCount={serviceCount}
+        teamCount={teamCount}
         isLoading={isLoading} 
       />
 

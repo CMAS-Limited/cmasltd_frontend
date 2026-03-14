@@ -20,13 +20,8 @@ import AdminLogin from './Admin/Pages/Login/AdminLogin';
 import DashboardHome from './Admin/Pages/DashboardHome/DashboardHome';
 import InquiriesList from './Admin/Pages/Inquiries/InquiriesList';
 import ManagePortfolio from './Admin/Pages/Portfolio/ManagePortfolio';
-
-// ==========================================
-// TEMPORARY ADMIN PAGE PLACEHOLDERS
-// (We will replace these with real files next)
-// ==========================================
-const ManageTeam = () => <div className="text-gray-500 font-medium">Team Management (Under Construction)</div>;
-const ManageServices = () => <div className="text-gray-500 font-medium">Services Management (Under Construction)</div>;
+import ManageTeam from './Admin/Pages/Team/ManageTeam';
+import ManageServices from './Admin/Pages/Service/ManageServices';
 
 // ==========================================
 // LAYOUT CONTROLLERS
