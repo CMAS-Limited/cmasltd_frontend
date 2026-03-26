@@ -1,9 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../../supabaseClient';
 import { Loader2, X, Upload } from 'lucide-react';
+import FormError from '../../Components/Shared/FormError'; 
+
+const translateError = (errorMsg) => {
+  const msg = errorMsg.toLowerCase();
+  if (msg.includes('malformed array literal')) return "There was a formatting issue with your comma-separated lists. Please check the features section.";
+  if (msg.includes('not-null constraint') || msg.includes('null value in column')) {
+    if (msg.includes('images')) return "A cover image is strictly required to save this project.";
+    if (msg.includes('mainfeatures')) return "You must provide at least one main feature for this project.";
+    if (msg.includes('category')) return "Please select a category for this project.";
+    return "The database rejected the save because a required piece of information is missing.";
+  }
+  if (msg.includes('invalid input syntax for type integer')) return "Please ensure numeric fields (like Project Year) contain only numbers, with no text or symbols.";
+  if (msg.includes('bucket not found')) return "System configuration error: The image storage folder is missing on the server.";
+  return "An unexpected server error occurred while saving. Please try again.";
+};
 
 const PortfolioFormModal = ({ isOpen, onClose, initialData, onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null); 
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
   
@@ -11,11 +27,15 @@ const PortfolioFormModal = ({ isOpen, onClose, initialData, onSuccess }) => {
     title: '', category: 'Commercial', location: '', cmas_role: '', project_year: '', description: '', mainfeatures: ''
   });
 
-  // Sync incoming data to local state upon modal instantiation
   useEffect(() => {
     if (isOpen) {
+      setErrorMessage(null); 
       if (initialData) {
-        setExistingImages(initialData.images || []);
+        const parsedImages = Array.isArray(initialData.images) 
+          ? initialData.images 
+          : (initialData.images ? initialData.images.split(',').map(img => img.trim()).filter(Boolean) : []);
+          
+        setExistingImages(parsedImages);
         setFormData({
           title: initialData.title || '',
           category: initialData.category || '',
@@ -23,7 +43,7 @@ const PortfolioFormModal = ({ isOpen, onClose, initialData, onSuccess }) => {
           cmas_role: initialData.cmas_role || '',
           project_year: initialData.project_year || '',
           description: initialData.description || '',
-          mainfeatures: initialData.mainfeatures ? initialData.mainfeatures.join(', ') : '',
+          mainfeatures: Array.isArray(initialData.mainfeatures) ? initialData.mainfeatures.join(', ') : (initialData.mainfeatures || ''), 
         });
       } else {
         setExistingImages([]);
@@ -35,9 +55,13 @@ const PortfolioFormModal = ({ isOpen, onClose, initialData, onSuccess }) => {
 
   if (!isOpen) return null;
 
-  const handleInputChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleInputChange = (e) => {
+    setErrorMessage(null); 
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleFileChange = (e) => {
+    setErrorMessage(null);
     const incomingFiles = Array.from(e.target.files);
     setSelectedFiles((prev) => [...prev, ...incomingFiles]);
     e.target.value = '';
@@ -51,10 +75,8 @@ const PortfolioFormModal = ({ isOpen, onClose, initialData, onSuccess }) => {
     for (const file of selectedFiles) {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
-      
       const { error } = await supabase.storage.from('portfolio-images').upload(fileName, file);
       if (error) throw error;
-      
       const { data: publicUrlData } = supabase.storage.from('portfolio-images').getPublicUrl(fileName);
       uploadedUrls.push(publicUrlData.publicUrl);
     }
@@ -63,6 +85,29 @@ const PortfolioFormModal = ({ isOpen, onClose, initialData, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage(null);
+
+    // 1. ABSOLUTE STRICT VALIDATION MATRIX
+    // Check every single text field to ensure none are empty
+    if (
+      !formData.title.trim() || 
+      !formData.category.trim() || 
+      !formData.location.trim() || 
+      !formData.cmas_role.trim() || 
+      !formData.project_year.trim() || 
+      !formData.description.trim() || 
+      !formData.mainfeatures.trim()
+    ) {
+      setErrorMessage("Validation Failed: Every field is mandatory. Please fill out all details before saving.");
+      return;
+    }
+    
+    // Check if there are no images
+    if (existingImages.length === 0 && selectedFiles.length === 0) {
+      setErrorMessage("Validation Failed: Please upload at least one image for this project.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -70,14 +115,14 @@ const PortfolioFormModal = ({ isOpen, onClose, initialData, onSuccess }) => {
       const finalImagesArray = [...existingImages, ...newImageUrls];
 
       const payload = {
-        title: formData.title,
-        category: formData.category,
-        location: formData.location,
-        cmas_role: formData.cmas_role,
-        project_year: formData.project_year,
-        description: formData.description,
+        title: formData.title.trim(),
+        category: formData.category.trim(),
+        location: formData.location.trim(),
+        cmas_role: formData.cmas_role.trim(),
+        project_year: formData.project_year.trim(),
+        description: formData.description.trim(),
         mainfeatures: formData.mainfeatures.split(',').map(s => s.trim()).filter(Boolean),
-        images: finalImagesArray
+        images: finalImagesArray 
       };
 
       if (initialData?.id) {
@@ -88,11 +133,11 @@ const PortfolioFormModal = ({ isOpen, onClose, initialData, onSuccess }) => {
         if (error) throw error;
       }
       
-      onSuccess(); // Trigger parent re-fetch
-      onClose();   // Terminate modal
+      onSuccess(); 
+      onClose();   
     } catch (error) {
-      console.error("Commit Error:", error.message);
-      alert("System Failure: Check console for data rejection details.");
+      console.error("Backend Error Log:", error.message);
+      setErrorMessage(translateError(error.message));
     } finally {
       setIsSubmitting(false);
     }
@@ -101,7 +146,7 @@ const PortfolioFormModal = ({ isOpen, onClose, initialData, onSuccess }) => {
   return (
     <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
           <h3 className="text-lg font-bold text-gray-900 uppercase tracking-widest">
             {initialData ? 'Modify Project Data' : 'Initialize New Project'}
           </h3>
@@ -110,7 +155,10 @@ const PortfolioFormModal = ({ isOpen, onClose, initialData, onSuccess }) => {
           </button>
         </div>
 
-        <div className="p-8 overflow-y-auto">
+        <div className="p-8 overflow-y-auto flex flex-col gap-6">
+          
+          <FormError message={errorMessage} clearError={() => setErrorMessage(null)} />
+
           <form id="portfolio-form" onSubmit={handleSubmit} className="flex flex-col gap-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
@@ -118,22 +166,22 @@ const PortfolioFormModal = ({ isOpen, onClose, initialData, onSuccess }) => {
                 <input type="text" name="title" value={formData.title} onChange={handleInputChange} required className="w-full bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-teal-600 transition-colors" />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Category</label>
-                <input type="text" name="category" value={formData.category} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-teal-600 transition-colors" />
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Category *</label>
+                <input type="text" name="category" value={formData.category} onChange={handleInputChange} required className="w-full bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-teal-600 transition-colors" />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Location</label>
-                <input type="text" name="location" value={formData.location} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-teal-600 transition-colors" />
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Location *</label>
+                <input type="text" name="location" value={formData.location} onChange={handleInputChange} required className="w-full bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-teal-600 transition-colors" />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Project Year</label>
-                <input type="text" name="project_year" value={formData.project_year} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-teal-600 transition-colors" />
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Project Year *</label>
+                <input type="text" name="project_year" value={formData.project_year} onChange={handleInputChange} required className="w-full bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-teal-600 transition-colors" />
               </div>
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">CMAS Role</label>
-              <input type="text" name="cmas_role" value={formData.cmas_role} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-teal-600 transition-colors" />
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">CMAS Role *</label>
+              <input type="text" name="cmas_role" value={formData.cmas_role} onChange={handleInputChange} required className="w-full bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-teal-600 transition-colors" />
             </div>
 
             <div className="flex flex-col gap-2">
@@ -142,12 +190,12 @@ const PortfolioFormModal = ({ isOpen, onClose, initialData, onSuccess }) => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Main Features (Comma Separated)</label>
-              <textarea name="mainfeatures" value={formData.mainfeatures} onChange={handleInputChange} rows="2" className="w-full bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-teal-600 transition-colors resize-none"></textarea>
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Main Features (Comma Separated) *</label>
+              <textarea name="mainfeatures" value={formData.mainfeatures} onChange={handleInputChange} required rows="2" className="w-full bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-teal-600 transition-colors resize-none" placeholder="e.g. 500 Capacity, Smart Lighting, Eco-friendly"></textarea>
             </div>
 
             <div className="flex flex-col gap-4 p-4 border border-dashed border-gray-300 rounded-xl bg-gray-50/50">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2"><Upload className="w-3 h-3" /> Image Infrastructure</label>
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2"><Upload className="w-3 h-3" /> Image Infrastructure *</label>
               
               {existingImages.length > 0 && (
                 <div>
@@ -186,7 +234,7 @@ const PortfolioFormModal = ({ isOpen, onClose, initialData, onSuccess }) => {
           </form>
         </div>
 
-        <div className="px-8 py-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+        <div className="px-8 py-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 shrink-0">
           <button onClick={onClose} type="button" className="px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-gray-50 transition-colors">Abort</button>
           <button form="portfolio-form" type="submit" disabled={isSubmitting} className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors disabled:opacity-70 min-w-[140px]">
             {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Execute Commit'}
