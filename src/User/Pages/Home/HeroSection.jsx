@@ -60,14 +60,24 @@ const Hero = () => {
 
         {/* Action Buttons */}
         <div className="flex flex-col md:flex-row gap-5 justify-center items-center w-full">
-          <button className="w-full md:w-auto px-10 py-4 bg-teal-600 hover:bg-teal-500 text-white rounded font-semibold transition-all transform hover:scale-105 shadow-lg shadow-teal-900/20 text-lg">
-            Our Expertise
-          </button>
-          
-          <button className="w-full md:w-auto px-10 py-4 border border-white/30 text-white rounded font-semibold hover:bg-white/10 transition-all backdrop-blur-sm text-lg">
-            View Portfolio
-          </button>
-        </div>
+  
+  {/* Scrolls down to the Services section we built earlier */}
+  <a 
+    href="#expertise" 
+    className="w-full md:w-auto px-10 py-4 bg-teal-600 hover:bg-teal-500 text-white rounded font-semibold transition-all transform hover:scale-105 shadow-lg shadow-teal-900/20 text-lg text-center"
+  >
+    Our Expertise
+  </a>
+  
+  {/* Navigates to the Portfolio page (change the href if your route is different) */}
+  <a 
+    href="#portfolio" 
+    className="w-full md:w-auto px-10 py-4 border border-white/30 text-white rounded font-semibold hover:bg-white/10 transition-all backdrop-blur-sm text-lg text-center"
+  >
+    View Portfolio
+  </a>
+
+</div>
       </div>
 
       {/* Scroll Indicator - Positioned absolutely at the bottom to fill the empty space */}

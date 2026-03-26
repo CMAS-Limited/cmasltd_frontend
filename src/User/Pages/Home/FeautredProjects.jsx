@@ -1,91 +1,94 @@
-// src/User/Components/Sections/FeaturedProjects.jsx
 import React, { useRef, useEffect, useState } from 'react';
+import { supabase } from '../../../supabaseClient'; 
 import ProjectCard from '../../Components/UI/ProjectCard';
-import { ArrowRight, Layers } from 'lucide-react';
+import { ArrowRight, Layers, Loader2 } from 'lucide-react';
 
 const FeaturedProjects = () => {
   const scrollRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+  
+  // Database States
+  const [projects, setProjects] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // === DATA ===
-  const projects = [
-    {
-      id: 1,
-      title: "Nairobi Expressway Plaza",
-      location: "Nairobi, Kenya",
-      category: "Infrastructure",
-      year: "2023",
-      image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?q=80&w=2070&auto=format&fit=crop",
-      description: "A landmark commercial hub integrating modern office spaces with retail outlets, serving as the operational headquarters.",
-      stats: { value: "$45M", label: "Project Value" }
-    },
-    {
-      id: 2,
-      title: "Sarit Centre Expansion",
-      location: "Westlands, Nairobi",
-      category: "Commercial",
-      year: "2021",
-      image: "https://images.unsplash.com/photo-1555636222-cae831e670b3?q=80&w=2077&auto=format&fit=crop",
-      description: "Comprehensive expansion and modernization of one of East Africa's premier shopping destinations.",
-      stats: { value: "250k", label: "Sq Ft Added" }
-    },
-    {
-      id: 3,
-      title: "Global Trade Centre (GTC)",
-      location: "Nairobi, Kenya",
-      category: "Mixed-Use",
-      year: "2022",
-      image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=2070&auto=format&fit=crop",
-      description: "An iconic mixed-use development featuring an office tower, luxury hotel, and residential apartments.",
-      stats: { value: "184m", label: "Height" }
-    },
-    {
-      id: 4,
-      title: "Diani Beach Resort",
-      location: "Diani, Kwale",
-      category: "Hospitality",
-      year: "2024",
-      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop",
-      description: "A 5-star luxury beachfront resort designed with sustainable materials and eco-friendly construction practices.",
-      stats: { value: "5-Star", label: "Rating" }
-    },
-    {
-      id: 5,
-      title: "Kileleshwa Heights",
-      location: "Kileleshwa, Nairobi",
-      category: "Residential",
-      year: "2023",
-      image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=2070&auto=format&fit=crop",
-      description: "Modern luxury apartments focused on sustainable living and community spaces.",
-      stats: { value: "120", label: "Units" }
+  // === DATA EXTRACTION ===
+  useEffect(() => {
+    fetchPortfolio();
+  }, []);
+
+  const fetchPortfolio = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('portfolio_projects')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(8); 
+
+      if (error) throw error;
+
+      // Map the backend data to match exactly what the ProjectCard expects
+      const formattedProjects = data.map((item) => {
+        const coverImg = Array.isArray(item.images) && item.images.length > 0 
+          ? item.images[0] 
+          : 'https://images.unsplash.com/photo-1486325212027-8081e485255e?q=80&w=2070&auto=format&fit=crop'; 
+
+        // --- NEW STATS MAPPING LOGIC ---
+        // Check if features exist and are stored as an array
+        const hasFeatures = Array.isArray(item.mainfeatures) && item.mainfeatures.length > 0;
+        
+        // Grab the first feature for the BIG text (Fallback to project year if empty)
+        const statValue = hasFeatures ? item.mainfeatures[0] : item.project_year;
+        
+        // Grab the second feature for the SMALL label (Fallback to 'Highlight' if they only typed one word)
+        const statLabel = hasFeatures && item.mainfeatures.length > 1 ? item.mainfeatures[1] : 'Highlight';
+
+        return {
+          id: item.id,
+          title: item.title,
+          location: item.location || 'Kenya',
+          category: item.category,
+          year: item.project_year,
+          image: coverImg,
+          description: item.description,
+          
+          // Inject the dynamically mapped features into the card's stats
+          stats: { 
+            value: statValue, 
+            label: statLabel 
+          }
+        };
+      });
+
+      setProjects(formattedProjects);
+    } catch (error) {
+      console.error("Error fetching portfolio:", error.message);
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
 
   // === AUTO SCROLL & INFINITE LOOP LOGIC ===
   useEffect(() => {
+    // Prevent the scroll script from running if we are still loading or have no data
+    if (isLoading || projects.length === 0) return;
+
     const scrollContainer = scrollRef.current;
     if (!scrollContainer) return;
 
     let animationFrameId;
 
     const scrollLoop = () => {
-      // If user is dragging, STOP auto-scroll
       if (isDragging) return;
 
       if (scrollContainer) {
-        // Move forward by 0.5px per frame (Adjust for speed)
         scrollContainer.scrollLeft += 0.5;
 
         // INFINITE LOGIC:
-        // We have 2 sets of cards. The "halfway point" is approximately half the scrollWidth.
-        // If we scroll past the first set, we instantly jump back to 0.
-        // This math assumes the two sets are identical width.
         const maxScroll = scrollContainer.scrollWidth / 2;
-        
         if (scrollContainer.scrollLeft >= maxScroll) {
-          scrollContainer.scrollLeft = 0; // Seamless jump back to start
+          scrollContainer.scrollLeft = 0; 
         }
       }
       animationFrameId = requestAnimationFrame(scrollLoop);
@@ -93,7 +96,7 @@ const FeaturedProjects = () => {
 
     animationFrameId = requestAnimationFrame(scrollLoop);
     return () => cancelAnimationFrame(animationFrameId);
-  }, [isDragging]); // Re-run when dragging state changes
+  }, [isDragging, isLoading, projects.length]); // Re-run when dragging state or data changes
 
 
   // === MANUAL DRAG HANDLERS (Mouse & Touch) ===
@@ -113,13 +116,30 @@ const FeaturedProjects = () => {
     if (!isDragging) return;
     e.preventDefault();
     const x = e.pageX || e.touches[0].pageX;
-    const walk = (x - scrollRef.current.offsetLeft - startX) * 2; // *2 for faster scroll speed
+    const walk = (x - scrollRef.current.offsetLeft - startX) * 2; 
     scrollRef.current.scrollLeft = scrollLeft - walk;
   };
 
   const handleStopDragging = () => {
     setIsDragging(false);
   };
+
+  // Graceful loading state
+  if (isLoading) {
+    return (
+      <section id="portfolio" className="relative py-24 bg-[#0F5156] flex justify-center items-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-3 text-teal-400">
+          <Loader2 className="w-8 h-8 animate-spin" />
+          <p className="text-xs font-bold uppercase tracking-widest">Loading Portfolio...</p>
+        </div>
+      </section>
+    );
+  }
+
+  // Graceful empty state
+  if (!projects || projects.length === 0) {
+    return null;
+  }
 
   return (
     <section id="portfolio" className="relative py-24 bg-[#0F5156] overflow-hidden">
@@ -139,12 +159,13 @@ const FeaturedProjects = () => {
                 </span>
              </div>
              <h2 className="text-4xl md:text-6xl font-bold text-white font-display leading-tight">
-               Featured <span className="text-teal-400">Projects</span>
+                Featured <span className="text-teal-400">Projects</span>
              </h2>
              <p className="text-teal-100/70 mt-6 text-lg leading-relaxed max-w-xl">
                A showcase of our defining work across infrastructure, commercial, and residential sectors.
              </p>
           </div>
+          {/* Note: Update this href if you create a dedicated standalone portfolio page later */}
           <a href="#" className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-teal-400/30 text-white font-semibold hover:bg-teal-400 hover:text-[#0F5156] transition-all">
             View All Projects <ArrowRight className="w-4 h-4" />
           </a>

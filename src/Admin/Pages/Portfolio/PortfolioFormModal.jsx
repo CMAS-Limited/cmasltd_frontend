@@ -191,7 +191,7 @@ const PortfolioFormModal = ({ isOpen, onClose, initialData, onSuccess }) => {
 
             <div className="flex flex-col gap-2">
               <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Main Features (Comma Separated) *</label>
-              <textarea name="mainfeatures" value={formData.mainfeatures} onChange={handleInputChange} required rows="2" className="w-full bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-teal-600 transition-colors resize-none" placeholder="e.g. 500 Capacity, Smart Lighting, Eco-friendly"></textarea>
+              <textarea name="mainfeatures" value={formData.mainfeatures} onChange={handleInputChange} required rows="2" className="w-full bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-teal-600 transition-colors resize-none" placeholder="e.g. 240, Units"></textarea>
             </div>
 
             <div className="flex flex-col gap-4 p-4 border border-dashed border-gray-300 rounded-xl bg-gray-50/50">
