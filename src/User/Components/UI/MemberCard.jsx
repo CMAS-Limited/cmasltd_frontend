@@ -1,6 +1,5 @@
-// src/User/Components/TeamCard.jsx
 import React, { useState } from 'react';
-import { Linkedin, Mail, Award } from 'lucide-react';
+import { Linkedin, Award } from 'lucide-react'; 
 
 const TeamCard = ({ member }) => {
   // State to handle "Tap" on mobile
@@ -26,25 +25,30 @@ const TeamCard = ({ member }) => {
 
         {/* Social Actions: Slide Up on Hover OR Tap */}
         <div className={`absolute bottom-0 inset-x-0 p-4 transition-transform duration-500 flex justify-center gap-3 z-20 ${isTapped ? 'translate-y-0' : 'translate-y-full group-hover:translate-y-0'}`}>
-           <a href={member.linkedin} className="p-2.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white hover:text-teal-700 transition-colors">
-             <Linkedin className="w-4 h-4" />
-           </a>
-           <a href={member.email} className="p-2.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white hover:text-teal-700 transition-colors">
-             <Mail className="w-4 h-4" />
-           </a>
+           {/* ONLY LinkedIn Remains */}
+           {member.linkedin && (
+             <a 
+               href={member.linkedin} 
+               target="_blank" 
+               rel="noopener noreferrer"
+               className="p-2.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white hover:text-teal-700 transition-colors"
+             >
+               <Linkedin className="w-4 h-4" />
+             </a>
+           )}
         </div>
       </div>
 
       {/* TEXT CONTENT */}
       <div className="p-5 text-center relative bg-white">
-        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-teal-50 border border-teal-100 text-teal-700 text-[9px] font-bold uppercase tracking-wider shadow-sm">
-             <Award className="w-3 h-3" />
-             {member.qualifications}
+        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-max max-w-[90%]">
+           <span className="inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-full bg-teal-50 border border-teal-100 text-teal-700 text-[9px] font-bold uppercase tracking-wider shadow-sm text-center">
+             <Award className="w-3 h-3 shrink-0" />
+             <span className="truncate">{member.qualifications}</span>
            </span>
         </div>
 
-        <div className="mt-3">
+        <div className="mt-4">
           <h3 className="text-lg font-bold text-gray-900 font-display mb-0.5 group-hover:text-teal-700 transition-colors">
             {member.name}
           </h3>
@@ -54,7 +58,7 @@ const TeamCard = ({ member }) => {
           
           <div className="w-8 h-0.5 bg-gray-100 mx-auto mb-3 group-hover:w-full group-hover:bg-teal-50 transition-all duration-500"></div>
 
-          <p className="text-gray-500 text-xs leading-relaxed line-clamp-3 group-hover:line-clamp-none transition-all">
+          <p className="text-gray-500 text-xs leading-relaxed line-clamp-3 group-hover:line-clamp-none transition-all break-words">
             {member.bio}
           </p>
         </div>

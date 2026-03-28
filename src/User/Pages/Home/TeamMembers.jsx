@@ -1,47 +1,64 @@
-// src/User/Components/Sections/Team.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../../supabaseClient'; 
 import TeamCard from '../../Components/UI/MemberCard';
-import { ArrowRight, Users } from 'lucide-react';
+import { ArrowRight, Users, Loader2 } from 'lucide-react';
 
 const Team = () => {
-  const team = [
-    {
-      name: "QS. Robert Mathenge",
-      role: "Managing Partner",
-      qualifications: "MAAK (QS), CIArb",
-      image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1974&auto=format&fit=crop", 
-      bio: "A leading expert in construction arbitration and dispute resolution with over 20 years of experience managing high-value infrastructure projects across East Africa.",
-      linkedin: "#",
-      email: "mailto:robert@cmas.co.ke"
-    },
-    {
-      name: "Sarah Kamau",
-      role: "Senior Project Manager",
-      qualifications: "PMP, B.Arch",
-      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1976&auto=format&fit=crop",
-      bio: "Specializes in large-scale commercial developments, ensuring seamless integration between design teams and onsite execution.",
-      linkedin: "#",
-      email: "#"
-    },
-    {
-      name: "Eng. David Omondi",
-      role: "Lead Structural Engineer",
-      qualifications: "EBK, IEK",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=crop",
-      bio: "Expert in structural integrity and civil engineering, overseeing the technical compliance of all our infrastructure portfolios.",
-      linkedin: "#",
-      email: "#"
-    },
-    {
-      name: "Michelle Wanjiku",
-      role: "Head of Contract Admin",
-      qualifications: "LLB, MCIArb",
-      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=1961&auto=format&fit=crop",
-      bio: "A legal specialist in construction contracts, safeguarding client interests through rigorous risk analysis and claims management.",
-      linkedin: "#",
-      email: "#"
+  const [team, setTeam] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchActiveTeam();
+  }, []);
+
+  const fetchActiveTeam = async () => {
+    try {
+      // Fetch only active members, ordered by creation date (or you can add a 'sort_order' column later)
+      const { data, error } = await supabase
+        .from('team_members')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      // Map the backend database columns to the prop names your TeamCard expects
+      const formattedTeam = data.map(member => ({
+        id: member.id,
+        name: member.name,
+        role: member.role,
+        // Safely format the accreditation array into a comma-separated string for the UI
+        qualifications: Array.isArray(member.accreditation) ? member.accreditation.join(', ') : (member.accreditation || ''),
+        image: member.image_url || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1974&auto=format&fit=crop', // Fallback image
+        bio: member.bio,
+        linkedin: member.linkin,
+        email: "#" // Placeholder since email wasn't in the original backend schema
+      }));
+
+      setTeam(formattedTeam || []);
+    } catch (error) {
+      console.error("Error fetching team:", error.message);
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
+
+  // Graceful loading state
+  if (isLoading) {
+    return (
+      <section id="team" className="py-24 bg-gray-50 flex justify-center items-center min-h-[500px]">
+        <div className="flex flex-col items-center gap-3 text-teal-600">
+          <Loader2 className="w-8 h-8 animate-spin" />
+          <p className="text-xs font-bold uppercase tracking-widest">Loading Personnel...</p>
+        </div>
+      </section>
+    );
+  }
+
+  // Graceful empty state (hides section if no active members exist)
+  if (!team || team.length === 0) {
+    return null;
+  }
 
   return (
     <section id="team" className="py-24 bg-gray-50 overflow-hidden relative">
@@ -55,7 +72,7 @@ const Team = () => {
         {/* === HEADER SECTION === */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 items-start">
           
-          {/* LEFT: Title (With your specified Left Padding) */}
+          {/* LEFT: Title */}
           <div className="lg:col-span-5 md:pl-12 lg:pl-16">
              <div className="inline-flex items-center gap-2 mb-3">
                 <div className="h-px w-8 bg-teal-600"></div>
@@ -64,7 +81,7 @@ const Team = () => {
                 </span>
              </div>
              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 font-display leading-[1.1]">
-               Meet the <br /> <span className="text-teal-600">Experts</span>
+                Meet the <br /> <span className="text-teal-600">Experts</span>
              </h2>
           </div>
 
@@ -83,10 +100,10 @@ const Team = () => {
 
         </div>
 
-        {/* === CARDS (Now using the interactive component) === */}
+        {/* === CARDS === */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {team.map((member, index) => (
-            <TeamCard key={index} member={member} />
+          {team.map((member) => (
+            <TeamCard key={member.id} member={member} />
           ))}
         </div>
 
