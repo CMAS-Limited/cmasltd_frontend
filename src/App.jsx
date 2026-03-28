@@ -30,7 +30,7 @@ import ManageServices from './Admin/Pages/Service/ManageServices';
 // PublicLayout wraps the standard website pages with the Navbar and Footer
 const PublicLayout = () => {
   return (
-    <div className="flex flex-col min-h-screen font-sans text-gray-900 bg-gray-50 overflow-x-hidden">
+    <div className="flex flex-col min-h-screen font-sans text-gray-900 bg-gray-50">
       <Navbar />
       <div className="flex-grow">
         <Outlet /> {/* This injects the specific page content (Home, About, etc.) */}
