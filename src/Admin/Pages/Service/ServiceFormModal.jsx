@@ -5,7 +5,7 @@ import FormError from '../../Components/Shared/FormError';
 
 const translateError = (errorMsg) => {
   const msg = errorMsg.toLowerCase();
-  if (msg.includes('malformed array literal')) return "There was a formatting issue with your comma-separated lists. Please check the features section.";
+  if (msg.includes('malformed array literal')) return "There was a formatting issue with your list. Please check the features section.";
   if (msg.includes('not-null constraint') || msg.includes('null value in column')) {
     if (msg.includes('image_url')) return "A background cover image is strictly required to save this service.";
     if (msg.includes('features')) return "You must provide at least one key feature.";
@@ -36,7 +36,8 @@ const ServiceFormModal = ({ isOpen, onClose, initialData, onSuccess }) => {
           icon_name: initialData.icon_name || '',
           description: initialData.description || '',
           long_description: initialData.long_description || '',
-          features: Array.isArray(initialData.features) ? initialData.features.join(', ') : (initialData.features || '')
+          // THE FIX: Join array items with a newline character instead of a comma
+          features: Array.isArray(initialData.features) ? initialData.features.join('\n') : (initialData.features || '')
         });
       } else {
         setExistingImage(null);
@@ -74,7 +75,7 @@ const ServiceFormModal = ({ isOpen, onClose, initialData, onSuccess }) => {
     e.preventDefault();
     setErrorMessage(null);
 
-    // 1. ABSOLUTE STRICT VALIDATION MATRIX (Every field is mandatory)
+    // 1. ABSOLUTE STRICT VALIDATION MATRIX
     if (
       !formData.title.trim() || 
       !formData.short_title.trim() || 
@@ -105,7 +106,8 @@ const ServiceFormModal = ({ isOpen, onClose, initialData, onSuccess }) => {
         icon_name: formData.icon_name.trim(),
         description: formData.description.trim(),
         long_description: formData.long_description.trim(),
-        features: formData.features ? formData.features.split(',').map(s => s.trim()).filter(Boolean) : [], 
+        // THE FIX: Split by newline (\n), trim extra spaces, and remove any empty lines
+        features: formData.features ? formData.features.split('\n').map(s => s.trim()).filter(Boolean) : [], 
         image_url: finalImageUrl
       };
 
@@ -166,7 +168,7 @@ const ServiceFormModal = ({ isOpen, onClose, initialData, onSuccess }) => {
                 onChange={handleInputChange} 
                 required 
                 className="w-full bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-teal-600 transition-colors" 
-                placeholder="e.g., 'QS' (short format) or 'Quantity Surveying' (long format)" 
+                placeholder="e.g., 'Compass' or 'lucide-gavel'" 
               />
             </div>
 
@@ -181,8 +183,16 @@ const ServiceFormModal = ({ isOpen, onClose, initialData, onSuccess }) => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Key Features (Comma Separated) *</label>
-              <textarea name="features" value={formData.features} onChange={handleInputChange} required rows="2" className="w-full bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-teal-600 transition-colors resize-none"></textarea>
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Key Features (One per line) *</label>
+              <textarea 
+                name="features" 
+                value={formData.features} 
+                onChange={handleInputChange} 
+                required 
+                rows="8" 
+                className="w-full bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-teal-600 transition-colors resize-y"
+                placeholder="Preparation of the project execution plan.&#10;Tendering management and tender negotiations.&#10;Management of the initial mobilization stages..."
+              ></textarea>
             </div>
 
             <div className="flex flex-col gap-4 p-4 border border-dashed border-gray-300 rounded-xl bg-gray-50/50">
